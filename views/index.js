@@ -8,28 +8,28 @@ const today = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
 document.getElementById('date').setAttribute('max', today);
 
 
+document.getElementById("search").addEventListener("click",(event)=>{
 
-function searchFormSubmit(event) {
-  event.preventDefault();
+    const date = document.getElementById("date").value
+    store_date = date;
+  
+    axios
+      .post("http://localhost:4000/", { date: date })
+      .then((result) => {
+        if (result.data === false) {
+          document.getElementById("success").style.display = "none"
+          displayForm.style.display = "block";
+        } else {
+          displayForm.style.display = "none";
+          document.getElementById("success").style.display = "block"
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
 
-  const date = event.target.date.value;
-  store_date = date;
 
-  axios
-    .post("http://localhost:4000/", { date: date })
-    .then((result) => {
-      if (result.data === false) {
-        document.getElementById("success").style.display = "none"
-        displayForm.style.display = "block";
-      } else {
-        displayForm.style.display = "none";
-        document.getElementById("success").style.display = "block"
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-}
+})
 
 function displayFormSubmit(event) {
   event.preventDefault();
