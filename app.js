@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const sequelize = require('./database/database');
 const attendance = require("./models/model");
+const { where } = require('sequelize');
 
 
 // const routes = require('./Route/routes'); // Assuming routes are in a separate file
@@ -23,6 +24,58 @@ app.post("/attendance",(req,res,next)=>{
         });
     });
     res.sendStatus(200)
+})
+
+app.post("/fetch",(req,res,next)=>{
+
+    const arr = req.body
+    const finalData = []
+async function test(arr) {
+    try{
+        for (let i = 0; i < arr.length; i++) {
+            await attendance
+              .findAll({ where: arr[i] })
+              .then((result) => {
+                const length = result.length;
+                const presentDays = NoOfDayPresent(result);
+                const percentage = Math.floor((presentDays / length) * 100);
+          
+                const studentData = {
+                  studentName: arr[i].studentName,
+                //   totalDays: length,
+                  presentDays: presentDays+"/"+length,
+                  percentage: percentage,
+                };
+          
+                finalData.push(studentData)
+              })
+              
+          }
+
+          res.json(finalData);
+
+    }catch(err){
+        console.log(err)
+    }
+    
+      
+}
+
+function NoOfDayPresent(data) {
+  let counter = 0;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].attendance === true) {
+      counter++;
+    }
+  }
+
+  return counter;
+}
+
+
+test(arr) 
+
+  
 })
 
 app.post("/",(req,res,next)=>{

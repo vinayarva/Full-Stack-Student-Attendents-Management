@@ -9,13 +9,14 @@
 <link rel="stylesheet" href="styles.css" />
 
 <body>
-    
-        <label for="date">Date</label>
-        <input type="date" name="date" id="date">
-        <button type="button" id="search">Search</button>
-    
 
-    
+    <label for="date">Date</label>
+    <input type="date" name="date" id="date">
+    <button type="button" id="search">Search</button>
+    <button type="button" id="fetch">Attendance Report</button>
+
+
+
 
     <form onsubmit='displayFormSubmit(event)' id="displayForm" style="display:none;">
         <h1>Attendance</h1>
@@ -54,7 +55,35 @@
 
         <button type="submit" id="submit">Submit</button>
     </form>
-    <div id="success" style="display: none;"><h1>Attendance Taken</h1></div>
+    <div id="success" style="display: none;">
+        <h1>Attendance Taken</h1>
+    </div>
+
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S/NO</th>
+                    <th>Student Name</th>
+                    <th>Attendance</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+
+
+
+
+
+
+
+
+
+
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.7/axios.min.js"
         integrity="sha512-DdX/YwF5e41Ok+AI81HI8f5/5UsoxCVT9GKYZRIzpLxb8Twz4ZwPPX+jQMwMhNQ9b5+zDEefc+dcvQoPWGNZ3g=="
