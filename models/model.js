@@ -1,27 +1,24 @@
 const sequelize = require("../database/database");
 const Sequelize = require("sequelize");
 
-/* const data = sequelize.define("Table Name", {
-  Column_Name_ID: {
+const attendance = sequelize.define("attendances", {
+    ID: {
     type: Sequelize.INTEGER,
     autoIncrement: true,
     allowNull: false,
     primaryKey: true,
     unique: true,
-  },
-  Column_Name: {
-    type: Sequelize.DOUBLE,
-    allowNull: false,
-  },
-  Column_Name: {
+  },date: {
+    type: Sequelize.DATEONLY,
+    allowNull: false },
+  studentName: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: false
   },
-  Column_Name: {
-    type: Sequelize.STRING,
+  attendance: {
+    type: Sequelize.BOOLEAN,
     allowNull: false,
   },
 });
 
-module.exports = data;
- */
+module.exports = attendance;
