@@ -33,3 +33,21 @@ table {
   tr:nth-child(even) {
     background-color: #dddddd;
   }
+
+
+  .taken_header{
+    margin:16px;
+}
+.taken_img {
+    margin-left: 250px;
+    margin-right: 10px;
+}
+.taken_li{
+    list-style: none;
+    font-size: 15px;
+    font-family: sans-serif;
+    padding: 10px;
+}
+
+
+

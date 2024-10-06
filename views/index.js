@@ -12,11 +12,12 @@ document.getElementById("search").addEventListener("click", (event) => {
   axios
     .post("http://localhost:4000/", { date: date })
     .then((result) => {
-      if (result.data === false) {
+      if (result.data === false ) {
         document.getElementById("success").style.display = "none";
         displayForm.style.display = "block";
       } else {
         displayForm.style.display = "none";
+            takenAttendance(result.data)
         document.getElementById("success").style.display = "block";
       }
     })
@@ -58,8 +59,7 @@ function displayFormSubmit(event) {
   axios
     .post("http://localhost:4000/attendance", studentsAttendance)
     .then((result) => {
-      document.getElementById("success").style.display = "block";
-      console.log(result);
+
     })
     .catch((err) => {
       console.log(err);
@@ -67,6 +67,8 @@ function displayFormSubmit(event) {
 
   displayForm.reset();
   displayForm.style.display = "none";
+
+
 }
 
 const students = [
@@ -78,6 +80,8 @@ const students = [
 ];
 
 document.getElementById("fetch").addEventListener("click", (e) => {
+    const ul = document.getElementById("taken_ul")
+      ul.innerHTML = ""
     document.querySelector("tbody").innerHTML = ""
   axios
     .post("http://localhost:4000/fetch",students)
@@ -111,4 +115,24 @@ function displayReport(data) {
     }
     
     document.querySelector("table").style.display = "table"; 
+}
+
+
+function takenAttendance(data){
+  const ul = document.getElementById("taken_ul")
+  ul.innerHTML = ""
+  for (let i = 0; i < data.length; i++) {
+    const user = data[i];
+
+    const li = document.createElement("li")
+    li.className = "taken.li"
+
+    if(user.attendance){
+        li.innerHTML = `${user.studentName}<img src="../media/present.png"  height="20px" class="taken_img"> Present`
+    }else{
+       li.innerHTML = `${user.studentName}<img src="../media/absent.png"  height="20px" class="taken_img"> Absent `
+    }
+
+    ul.appendChild(li)
+  }
 }

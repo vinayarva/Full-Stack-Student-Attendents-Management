@@ -4,10 +4,8 @@ const cors = require('cors');
 
 const sequelize = require('./database/database');
 const attendance = require("./models/model");
-const { where } = require('sequelize');
 
 
-// const routes = require('./Route/routes'); // Assuming routes are in a separate file
 
 const app = express();
 
@@ -83,11 +81,11 @@ app.post("/",(req,res,next)=>{
     attendance.findAll({where:{
         date: req.body.date
     }}).then((result)=>{
-        if(result.length > 0){
-            return res.send(true)
-        }else{
-            return res.send(false)
-        }
+            if(result.length > 0){
+                return res.json(result)
+            }else{
+                return res.send(false)
+            }
      }).catch(err => {
         console.log(err);
         return res.status(500)
