@@ -11,14 +11,14 @@
     integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
 
-<body>
+<body class="bg-primary">
 
     <!-- This Block of the code  is for the navigation bar for buttons -->
-    <nav class="navbar bg-body-tertiary mb-5" id="top_container">
-        <div class="container-fluid justify-content-start">
+    <nav class="navbar bg-body-tertiary mb-2" id="top_container">
+        <div class="container-fluid">
             <div class="d-flex">
 
-                <label for="date" class="col-form-label date_lable me-3">Date:</label>
+                <label for="date" class="col-form-label me-2">Date:</label>
                 <input class="form-control me-3" type="date" placeholder="Search" aria-label="Search" id="date">
                 <button class="btn btn-outline-primary" type="button" id="search">Search</button>
             </div>
@@ -28,7 +28,8 @@
     </nav>
 
     <!-- form container -->
-    <div class="container-fluid text-center" id="formSubmit_container" style="display: none;">
+    <div class="container text-center border bg-white rounded-3" id="formSubmit_container" style="display: none;">
+        <h2 class="text-center mb-3 mt-5 fw-normal" id="header_date_mark"></h2>
         <form onsubmit=displayFormSubmit(event) id="displayForm">
             <!-- Student-1 -->
             <div class="row d-flex justify-content-center mt-3">
@@ -96,7 +97,7 @@
             </div>
             <div class="d-grid col-3 mx-auto">
 
-                <button class="btn btn btn-outline-primary mt-5" type="submit">Submit</button>
+                <button class="btn btn btn-outline-primary mt-5 mb-5" type="submit">Mark Attendance</button>
 
             </div>
 
@@ -104,8 +105,9 @@
     </div>
 
 <!-- //success Container -->
-<div class="container" id="successful_container" style="display: none;">
-    <table class="table text-center">
+<div class="container border bg-white  rounded-3" id="successful_container" style="display: none;">
+    <h2 class="text-center mb-3 mt-3 fw-normal" id="header_date_success"></h2>
+    <table class="table text-center table-bordered">
       <thead>
         <tr>
           <th scope="col">S/No</th>
@@ -122,8 +124,12 @@
 
     <!-- this is the block of is for the report fetching of students -->
 
-    <div class="container mt-5" id="report_container" style="display: none;">
-        <table class="table table-bordered text-center">
+    <div class="container mt-2 border bg-white  rounded-3" id="report_container" style="display: none;">
+
+        <div><h1 class="text-center mb-3 fw-normal">Students Attendance Report</h1></div>
+
+       
+        <table class="table table-bordered text-center ">
             <thead>
                 <tr>
                     <th scope="col">S/No</th>

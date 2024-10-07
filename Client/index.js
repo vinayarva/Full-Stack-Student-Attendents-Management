@@ -8,6 +8,9 @@ const successful_container = document.getElementById("successful_container");
 
 const report_container = document.getElementById("report_container");
 
+const header_date_mark = document.getElementById("header_date_mark");
+const header_date_success  =document.getElementById("header_date_success")
+
 const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
 
 document.getElementById("date").setAttribute("max", today);
@@ -18,13 +21,16 @@ let store_date;
 
 document.getElementById("search").addEventListener("click", (event) => {
   const date = document.getElementById("date").value;
+
+  header_date_success.innerText = "Attendance For Date: "+date;
+  header_date_mark.innerText = "Attendance For Date: "+date;
   store_date = date;
   axios
     .post("http://localhost:4000/", { date: date }) //post request of search the date in the database
     .then((result) => {
       if (result.data === false) {
         successful_container.style.display = "none";
-        report_container.style.display = "none";
+        report_container.style.display = "none";    
         formSubmit_container.style.display = "block";
       } else {
         report_container.style.display = "none";
@@ -40,6 +46,7 @@ document.getElementById("search").addEventListener("click", (event) => {
 
 function displayFormSubmit(event) {
   event.preventDefault();
+
 
   const studentsAttendance = [
     {
@@ -70,7 +77,9 @@ function displayFormSubmit(event) {
   ];
   axios
     .post("http://localhost:4000/attendance", studentsAttendance)
-    .then((result) => {})
+    .then((result) => {
+      takenAttendance(studentsAttendance)
+    })
     .catch((err) => {
       console.log(err);
     });
