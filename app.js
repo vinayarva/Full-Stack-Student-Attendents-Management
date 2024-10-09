@@ -3,19 +3,23 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 
 const sequelize = require("./database/database");
-const Routes = require("./Route/routes");
-
-
+const Attendance = require("./models/attendance");
+const Student = require("./models/student_Model");
+const routes = require("./Route/route");
+const { FORCE } = require("sequelize/lib/index-hints");
 
 const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(Routes);
+Student.hasMany(Attendance, { foreignKey: "studentId" });
+Attendance.belongsTo(Student, { foreignKey: "studentId" });
+
+app.use(routes);
 
 sequelize
-  .sync({ force: false })
+  .sync()
   .then(() => {
     app.listen(4000, () => {
       console.log("Server is running on http://localhost:4000/");

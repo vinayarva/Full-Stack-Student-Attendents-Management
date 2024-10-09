@@ -1,42 +1,31 @@
-const displayForm = document.getElementById("displayForm");
-
-const top_container = document.getElementById("top_container");
-
-const formSubmit_container = document.getElementById("formSubmit_container");
-
-const successful_container = document.getElementById("successful_container");
-
-const report_container = document.getElementById("report_container");
-
-const header_date_mark = document.getElementById("header_date_mark");
-const header_date_success  =document.getElementById("header_date_success")
-
-const today = new Date().toISOString().split("T")[0]; // Format: YYYY-MM-DD
-
-document.getElementById("date").setAttribute("max", today);
-
 let store_date;
 
-//search button and event listener
-
-document.getElementById("search").addEventListener("click", (event) => {
-  const date = document.getElementById("date").value;
-
-  header_date_success.innerText = "Attendance For Date: "+date;
-  header_date_mark.innerText = "Attendance For Date: "+date;
-  store_date = date;
+document.getElementById("search").addEventListener("click", (e) => {
+  const date = document.getElementById("date");
+  store_date = date.value;
   axios
-    .post("http://localhost:4000/", { date: date }) //post request of search the date in the database
+    .post("http://localhost:4000/dateSearch", { date: date.value })
     .then((result) => {
-      if (result.data === false) {
-        successful_container.style.display = "none";
-        report_container.style.display = "none";    
-        formSubmit_container.style.display = "block";
+      const data = result.data;
+      if (data) {
+        document.getElementById("Students_Container").style.display = "none";
+        document.getElementById("presentDay_container").style.display = "none";
+        document.getElementById("report_container").style.display = "none";
+
+        createForm(data);
       } else {
-        report_container.style.display = "none";
-        formSubmit_container.style.display = "none";
-        takenAttendance(result.data);
-        successful_container.style.display = "block";
+        document.getElementById("Students_Container").style.display = "none";
+        document.getElementById("form_container").style.display = "none";
+        document.getElementById("report_container").style.display = "none";
+
+        axios
+          .post("http://localhost:4000/DayAttendance", { date: store_date })
+          .then((result) => {
+            takenAttendance(result.data);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       }
     })
     .catch((err) => {
@@ -44,64 +33,28 @@ document.getElementById("search").addEventListener("click", (event) => {
     });
 });
 
-function displayFormSubmit(event) {
-  event.preventDefault();
+document.getElementById("fetchstudents").addEventListener("click", (e) => {
+  document.getElementById("presentDay_container").style.display = "none";
+  document.getElementById("form_container").style.display = "none";
+  document.getElementById("report_container").style.display = "none";
 
-
-  const studentsAttendance = [
-    {
-      date: store_date,
-      studentName: "Student-1",
-      attendance: event.target.student1.value === "present" ? true : false,
-    },
-    {
-      date: store_date,
-      studentName: "Student-2",
-      attendance: event.target.student2.value === "present" ? true : false,
-    },
-    {
-      date: store_date,
-      studentName: "Student-3",
-      attendance: event.target.student3.value === "present" ? true : false,
-    },
-    {
-      date: store_date,
-      studentName: "Student-4",
-      attendance: event.target.student4.value === "present" ? true : false,
-    },
-    {
-      date: store_date,
-      studentName: "Student-5",
-      attendance: event.target.student5.value === "present" ? true : false,
-    },
-  ];
-  axios
-    .post("http://localhost:4000/attendance", studentsAttendance)
+  fetchStudentName()
     .then((result) => {
-      takenAttendance(studentsAttendance)
+      displayStudents(result);
     })
     .catch((err) => {
       console.log(err);
     });
-
-  displayForm.reset();
-  formSubmit_container.style.display = "none";
-}
-
-const students = [
-  { studentName: "Student-1" },
-  { studentName: "Student-2" },
-  { studentName: "Student-3" },
-  { studentName: "Student-4" },
-  { studentName: "Student-5" },
-];
+});
 
 document.getElementById("fetch").addEventListener("click", (e) => {
- 
+  document.getElementById("presentDay_container").style.display = "none";
+  document.getElementById("form_container").style.display = "none";
+  document.getElementById("Students_Container").style.display = "none";
+
   axios
-    .post("http://localhost:4000/fetch", students)
+    .get("http://localhost:4000/fetchReport")
     .then((result) => {
-      // console.log(result.data);
       displayReport(result.data);
     })
     .catch((err) => {
@@ -109,36 +62,123 @@ document.getElementById("fetch").addEventListener("click", (e) => {
     });
 });
 
-function displayReport(data) {
-  successful_container.style.display = "none";
-  formSubmit_container.style.display = "none";
+function handleFormSubmit(event) {
+  event.preventDefault();
 
-  const tbody = document.getElementById("report_tbody");
-  tbody.innerHTML =""
+  const students = fetchStudentName();
 
-  for (let i = 0; i < data.length; i++) {
+  students
+    .then((result) => {
+      const attendanceData = [];
+
+      result.forEach((student) => {
+        const attendanceStatusPresent = document.getElementById(
+          "P" + student.Id
+        ).checked;
+        const attendanceStatusAbsent = document.getElementById(
+          "A" + student.Id
+        ).checked;
+
+        attendanceData.push({
+          date: store_date,
+          attendance: attendanceStatusPresent ? true : false,
+          studentId: student.Id,
+        });
+      });
+
+      axios
+        .post("http://localhost:4000/attendance", attendanceData)
+        .then((result) => {
+          document.getElementById("form_container").style.display = "none";
+          axios
+            .post("http://localhost:4000/DayAttendance", { date: store_date })
+            .then((result) => {
+              takenAttendance(result.data);
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    })
+    .catch((err) => console.log(err));
+}
+
+function studentEnterForm(event) {
+  event.preventDefault();
+  const studentName = event.target.input.value;
+  axios
+    .post("http://localhost:4000/students", { studentName: studentName })
+    .then((result) => {
+      event.target.input.value = "";
+
+      displayStudents(result.data);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+}
+
+function displayStudents(data) {
+  const tbody = document.getElementById("student_tbody");
+  tbody.innerHTML = "";
+
+  data.forEach((element) => {
     const tr = document.createElement("tr");
-
     const th = document.createElement("th");
-    th.innerText = i + 1;
-    th.setAttribute("scope", "col");
+    th.innerText = element.Id;
     tr.appendChild(th);
 
-    Object.values(data[i]).forEach((value) => {
-      const td = document.createElement("td");
-      td.innerText = value;
-      tr.appendChild(td);
-    });
-
+    const td = document.createElement("td");
+    td.innerText = element.studentName;
+    tr.appendChild(td);
     tbody.appendChild(tr);
-  }
+  });
 
-  report_container.style.display = "block";
+  document.getElementById("Students_Container").style.display = "block";
+}
+
+async function fetchStudentName() {
+  try {
+    const result = await axios.get("http://localhost:4000/students");
+    return result.data;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function createForm(data) {
+  const container = document.getElementById("table_form");
+  container.innerHTML = "";
+
+  data.forEach((data) => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `   
+            <th scope="row">${data.Id}</th>
+            <td>${data.studentName}</td>
+            <td>
+                <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name=${data.Id} id="P${data.Id}" value="present">
+    <label class="form-check-label" for="P${data.Id}">Present</label>
+  </div>           
+            </td>
+            <td>
+            <div class="form-check form-check-inline">
+    <input class="form-check-input" type="radio" name=${data.Id} id="A${data.Id}" value="absent">
+    <label class="form-check-label" for="A${data.Id}">Absent</label>
+  </div> 
+                </td>        
+`;
+    container.appendChild(tr);
+  });
+
+  document.getElementById("form_container").style.display = "block";
 }
 
 function takenAttendance(data) {
-
-  // console.log(data)
   const tbody = document.getElementById("taken_tbody");
   tbody.innerHTML = "";
 
@@ -149,12 +189,12 @@ function takenAttendance(data) {
 
     const th = document.createElement("th");
     th.setAttribute("scope", "row");
-    th.innerText = i + 1;
+    th.innerText = user.student.Id;
     tr.appendChild(th);
 
     const td1 = document.createElement("td");
     td1.setAttribute("colspan", "2");
-    td1.innerText = user.studentName;
+    td1.innerText = user.student.studentName;
     tr.appendChild(td1);
 
     const td2 = document.createElement("td");
@@ -168,6 +208,42 @@ function takenAttendance(data) {
     tr.appendChild(td2);
     tbody.appendChild(tr);
   }
+  document.getElementById("presentDay_container").style.display = "block";
+}
 
-  successful_container.style.display = "block";
+function displayReport(data) {
+  const tbody = document.getElementById("report_tbody");
+  tbody.innerHTML = "";
+
+  for (let i = 0; i < data.length; i++) {
+    const user = data[i];
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <th scope="row">${user.Id}</th>
+      <td>${user.studentName}</td>
+      <td>${NoOfDayPresent(user.attendances)}/${user.attendances.length}</td>
+      <td>${percentage(user.attendances)}</td>`;
+
+    tbody.appendChild(tr);
+  }
+  document.getElementById("report_container").style.display = "block";
+}
+
+function NoOfDayPresent(data) {
+  let counter = 0;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].attendance === true) {
+      counter++;
+    }
+  }
+
+  return counter;
+}
+
+function percentage(data) {
+  let presentDays = NoOfDayPresent(data);
+
+  let total = data.length;
+  return Math.floor((presentDays / total) * 100);
 }
